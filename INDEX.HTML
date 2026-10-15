@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codice Game - Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #0f172a;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title.prof {
+      color: var(--accent);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"] {
+      background: #0b1329;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    .player-row {
+      padding-top: 14px;
+      margin-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .player-row:first-of-type {
+      border-top: none;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .player-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+    }
+
+    .btn-action {
+      width: 100%;
+      background: var(--success);
+      color: #064e3b;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-action:hover {
+      opacity: 0.9;
+    }
+
+    /* Classifica */
+    .leaderboard {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0b1329;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .rank {
+      font-size: 1.3rem;
+      font-weight: 800;
+      width: 28px;
+      color: var(--primary);
+    }
+
+    .rank-1 { color: #facc15; }
+    .rank-2 { color: #cbd5e1; }
+    .rank-3 { color: #d97706; }
+
+    .score {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* Tabella */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+
+    .btn-reset:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🎮 CODICE GAME</h1>
+    <p>Confronto codici giornaliero & Classifica progressiva</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('input-page')">📥 Inserisci Codici</button>
+    <button class="tab-btn" onclick="switchTab('leaderboard-page')">🏆 Classifica Generale</button>
+  </div>
+
+  <!-- SCHERMATA 1: INSERIMENTO CODICI -->
+  <div id="input-page" class="page active">
+    <!-- Codici Prof -->
+    <div class="card">
+      <div class="card-title prof">👨‍🏫 Codici Usciti del Professore</div>
+      <div class="grid-3">
+        <div class="input-group">
+          <label>Prof - Codice 1</label>
+          <input type="text" id="prof1" placeholder="es. Q2IXT" maxlength="10">
+        </div>
+        <div class="input-group">
+          <label>Prof - Codice 2</label>
+          <input type="text" id="prof2" placeholder="es. A3B9C" maxlength="10">
+        </div>
+        <div class="input-group">
+          <label>Prof - Codice 3</label>
+          <input type="text" id="prof3" placeholder="es. X8Y7Z" maxlength="10">
+        </div>
+      </div>
+    </div>
+
+    <!-- Codici Ragazzi -->
+    <div class="card">
+      <div class="card-title">👥 Codici dei Ragazzi</div>
+      
+      <!-- ANDREA -->
+      <div class="player-row">
+        <div class="player-name">Andrea</div>
+        <div class="grid-3">
+          <input type="text" id="andrea_c1" placeholder="Codice 1" maxlength="10">
+          <input type="text" id="andrea_c2" placeholder="Codice 2" maxlength="10">
+          <input type="text" id="andrea_c3" placeholder="Codice 3" maxlength="10">
+        </div>
+      </div>
+
+      <!-- DANIEL -->
+      <div class="player-row">
+        <div class="player-name">Daniel</div>
+        <div class="grid-3">
+          <input type="text" id="daniel_c1" placeholder="Codice 1" maxlength="10">
+          <input type="text" id="daniel_c2" placeholder="Codice 2" maxlength="10">
+          <input type="text" id="daniel_c3" placeholder="Codice 3" maxlength="10">
+        </div>
+      </div>
+
+      <!-- SIMONE -->
+      <div class="player-row">
+        <div class="player-name">Simone</div>
+        <div class="grid-3">
+          <input type="text" id="simone_c1" placeholder="Codice 1" maxlength="10">
+          <input type="text" id="simone_c2" placeholder="Codice 2" maxlength="10">
+          <input type="text" id="simone_c3" placeholder="Codice 3" maxlength="10">
+        </div>
+      </div>
+
+      <!-- DAVIDE -->
+      <div class="player-row">
+        <div class="player-name">Davide</div>
+        <div class="grid-3">
+          <input type="text" id="davide_c1" placeholder="Codice 1" maxlength="10">
+          <input type="text" id="davide_c2" placeholder="Codice 2" maxlength="10">
+          <input type="text" id="davide_c3" placeholder="Codice 3" maxlength="10">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-action" onclick="calcolaEArchivia()">⚡ Calcola Punti & Archivia Giornata</button>
+  </div>
+
+  <!-- SCHERMATA 2: CLASSIFICA E RIEPILOGO -->
+  <div id="leaderboard-page" class="page">
+    <!-- Classifica Progressiva -->
+    <div class="card">
+      <div class="card-title">🏆 Classifica Generale (Totale Cumulativo)</div>
+      <div class="leaderboard" id="leaderboard-list">
+        <!-- Generato via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Risultati Ultimo Turno -->
+    <div class="card">
+      <div class="card-title">📊 Risultato Ultimo Turno Calcolato</div>
+      <div id="last-round-container">
+        <p style="color: var(--text-muted);">Nessun turno inserito oggi.</p>
+      </div>
+    </div>
+
+    <!-- Storico Turni -->
+    <div class="card">
+      <div class="card-title">📜 Registro Storico</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Data e Ora</th>
+            <th>Andrea</th>
+            <th>Daniel</th>
+            <th>Simone</th>
+            <th>Davide</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody">
+          <!-- Righe storico -->
+        </tbody>
+      </table>
+      <button class="btn-reset" onclick="resetDati()">⚠️ Azzera Tutti i Dati e Classifica</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PLAYERS = ['Andrea', 'Daniel', 'Simone', 'Davide'];
+
+  // Caricamento stato da localStorage
+  let gameState = JSON.parse(localStorage.getItem('codice_game_state')) || {
+    scores: { 'Andrea': 0, 'Daniel': 1, 'Simone': 0, 'Davide': 1 },
+    history: [
+      { date: '14/10/2026', Andrea: 0, Daniel: 1, Simone: 0, Davide: 1 }
+    ],
+    lastRound: null
+  };
+
+  // Navigazione Tab
+  function switchTab(tabId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    const activeBtnIndex = tabId === 'input-page' ? 0 : 1;
+    document.querySelectorAll('.tab-btn')[activeBtnIndex].classList.add('active');
+
+    if (tabId === 'leaderboard-page') {
+      renderLeaderboard();
+    }
+  }
+
+  // Conta quanti caratteri di codA sono presenti in codB (qualsiasi posizione)
+  function contaCorrispondenze(codA, codB) {
+    if (!codA || !codB) return 0;
+    const a = codA.trim().toUpperCase();
+    const b = codB.trim().toUpperCase();
+    let count = 0;
+    for (let char of a) {
+      if (b.includes(char)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  // Calcolo e Archiviazione
+  function calcolaEArchivia() {
+    const prof1 = document.getElementById('prof1').value;
+    const prof2 = document.getElementById('prof2').value;
+    const prof3 = document.getElementById('prof3').value;
+
+    if (!prof1 && !prof2 && !prof3) {
+      alert("Inserisci almeno uno dei codici del professore prima di calcolare!");
+      return;
+    }
+
+    const roundScores = {};
+    const roundDetails = {};
+
+    PLAYERS.forEach(player => {
+      const pKey = player.toLowerCase();
+      const c1 = document.getElementById(`${pKey}_c1`).value;
+      const c2 = document.getElementById(`${pKey}_c2`).value;
+      const c3 = document.getElementById(`${pKey}_c3`).value;
+
+      const pt1 = contaCorrispondenze(c1, prof1);
+      const pt2 = contaCorrispondenze(c2, prof2);
+      const pt3 = contaCorrispondenze(c3, prof3);
+      const tot = pt1 + pt2 + pt3;
+
+      roundScores[player] = tot;
+      roundDetails[player] = { c1, c2, c3, pt1, pt2, pt3, tot };
+
+      // Aggiunge al totale persistente
+      gameState.scores[player] = (gameState.scores[player] || 0) + tot;
+    });
+
+    // Salva nello storico
+    const now = new Date();
+    const dateFormatted = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth()+1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    gameState.history.unshift({
+      date: dateFormatted,
+      Andrea: roundScores['Andrea'],
+      Daniel: roundScores['Daniel'],
+      Simone: roundScores['Simone'],
+      Davide: roundScores['Davide']
+    });
+
+    gameState.lastRound = roundDetails;
+
+    // Salva su localStorage
+    localStorage.setItem('codice_game_state', JSON.stringify(gameState));
+
+    // Reset automatico dei campi di input per la volta successiva
+    document.querySelectorAll('#input-page input[type="text"]').forEach(input => input.value = '');
+
+    // Passa alla pagina classifica
+    switchTab('leaderboard-page');
+  }
+
+  // Render Classifica
+  function renderLeaderboard() {
+    const list = document.getElementById('leaderboard-list');
+    list.innerHTML = '';
+
+    // Ordina i giocatori per punteggio decrescente
+    const sortedPlayers = [...PLAYERS].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
+
+    sortedPlayers.forEach((player, index) => {
+      const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+      const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ' ';
+
+      const item = document.createElement('div');
+      item.className = 'leaderboard-item';
+      item.innerHTML = `
+        <div class="player-info">
+          <span class="rank ${rankClass}">#${index + 1}</span>
+          <span style="font-size: 1.15rem; font-weight: 700;">${player} ${medal}</span>
+        </div>
+        <div class="score">${gameState.scores[player]} <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">pt</span></div>
+      `;
+      list.appendChild(item);
+    });
+
+    // Render Ultimo Turno
+    const lastRoundDiv = document.getElementById('last-round-container');
+    if (!gameState.lastRound) {
+      lastRoundDiv.innerHTML = `<p style="color: var(--text-muted);">Nessun turno inserito oggi.</p>`;
+    } else {
+      let html = `<table>
+        <thead>
+          <tr>
+            <th>Giocatore</th>
+            <th>Slot 1</th>
+            <th>Slot 2</th>
+            <th>Slot 3</th>
+            <th>Punti Turno</th>
+          </tr>
+        </thead><tbody>`;
+      PLAYERS.forEach(player => {
+        const d = gameState.lastRound[player];
+        html += `
+          <tr>
+            <td style="font-weight: 600;">${player}</td>
+            <td>${d.c1 || '-'} (${d.pt1} pt)</td>
+            <td>${d.c2 || '-'} (${d.pt2} pt)</td>
+            <td>${d.c3 || '-'} (${d.pt3} pt)</td>
+            <td style="font-weight: 700; color: var(--primary);">+${d.tot} pt</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table>`;
+      lastRoundDiv.innerHTML = html;
+    }
+
+    // Render Tabella Storico
+    const tbody = document.getElementById('history-tbody');
+    tbody.innerHTML = '';
+    gameState.history.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.date}</td>
+        <td>+${row.Andrea}</td>
+        <td>+${row.Daniel}</td>
+        <td>+${row.Simone}</td>
+        <td>+${row.Davide}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Reset Completo
+  function resetDati() {
+    if (confirm("Vuoi azzerare definitivamente la classifica e lo storico?")) {
+      gameState = {
+        scores: { 'Andrea': 0, 'Daniel': 0, 'Simone': 0, 'Davide': 0 },
+        history: [],
+        lastRound: null
+      };
+      localStorage.setItem('codice_game_state', JSON.stringify(gameState));
+      renderLeaderboard();
+    }
+  }
+</script>
+</body>
+</html>
